@@ -215,36 +215,6 @@ app.get("/team_stats", function(req, res) {
     });
 });
 
-app.get("/team_stats/select_player", function(req, res) {
-  var player = req.query.player_choice;
-  var all = "SELECT * FROM football_games;";
-  var wins =
-    "SELECT COUNT(*) FROM football_games WHERE home_score > visitor_score;";
-  var losses =
-    "SELECT COUNT(*) FROM football_games WHERE home_score < visitor_score;";
-  db.task("get-everything", task => {
-    return task.batch([task.any(all), task.any(wins), task.any(losses)]);
-  })
-    .then(info => {
-      res.render("pages/team_stats", {
-        my_title: "Team Stats",
-        data: info[0],
-        win: info[1][0].count,
-        loss: info[2][0].count
-      });
-    })
-    .catch(err => {
-      // display error message in case an error
-      console.log("error", err);
-      res.render("pages/team_stats", {
-        my_title: "Team Stats",
-        data: "",
-        win: "",
-        loss: ""
-      });
-    });
-});
-
 // player info page
 app.get("/player_info", function(req, res) {
   var query = "SELECT * FROM football_players;";
