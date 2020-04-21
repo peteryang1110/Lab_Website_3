@@ -27,7 +27,7 @@ const dbConfig = {
   port: 5432,
   database: "football_db",
   user: "postgres",
-  password: "peter1110"
+  password: "peter1110",
 };
 
 var db = pgp(dbConfig);
@@ -79,44 +79,44 @@ app.use(express.static(__dirname + "/")); //This line is necessary for us to use
 ************************************/
 
 // login page
-app.get("/", function(req, res) {
+app.get("/", function (req, res) {
   res.render("pages/login", {
     local_css: "signin.css",
-    my_title: "Login Page"
+    my_title: "Login Page",
   });
 });
 
 // registration page
-app.get("/register", function(req, res) {
+app.get("/register", function (req, res) {
   res.render("pages/register", {
-    my_title: "Registration Page"
+    my_title: "Registration Page",
   });
 });
 
-app.get("/home", function(req, res) {
+app.get("/home", function (req, res) {
   var query = "SELECT * FROM favorite_colors;";
   db.any(query)
-    .then(function(rows) {
+    .then(function (rows) {
       res.render("pages/home", {
         my_title: "Home Page",
         data: rows,
         color: "",
-        color_msg: ""
+        color_msg: "",
       });
     })
-    .catch(function(err) {
+    .catch(function (err) {
       // display error message in case an error
       console.log("error", err);
       response.render("pages/home", {
         my_title: "Home Page",
         data: "",
         color: "",
-        color_msg: ""
+        color_msg: "",
       });
     });
 });
 
-app.post("/home/pick_color", function(req, res) {
+app.post("/home/pick_color", function (req, res) {
   var color_hex = req.body.color_hex;
   var color_name = req.body.color_name;
   var color_message = req.body.color_message;
@@ -130,55 +130,55 @@ app.post("/home/pick_color", function(req, res) {
     "') ON CONFLICT DO NOTHING;";
 
   var color_select = "SELECT * FROM favorite_colors;";
-  db.task("get-everything", task => {
+  db.task("get-everything", (task) => {
     return task.batch([task.any(insert_statement), task.any(color_select)]);
   })
-    .then(info => {
+    .then((info) => {
       res.render("pages/home", {
         my_title: "Home Page",
         data: info[1],
         color: color_hex,
-        color_msg: color_message
+        color_msg: color_message,
       });
     })
-    .catch(err => {
+    .catch((err) => {
       // display error message in case an error
       console.log("error", err);
       response.render("pages/home", {
         my_title: "Home Page",
         data: "",
         color: "",
-        color_msg: ""
+        color_msg: "",
       });
     });
 });
 
-app.get("/home/pick_color", function(req, res) {
+app.get("/home/pick_color", function (req, res) {
   var color_choice = req.query.color_selection;
   var color_options = "SELECT * FROM favorite_colors;";
   var color_message =
     "SELECT color_msg FROM favorite_colors WHERE hex_value = '" +
     color_choice +
     "';";
-  db.task("get-everything", task => {
+  db.task("get-everything", (task) => {
     return task.batch([task.any(color_options), task.any(color_message)]);
   })
-    .then(info => {
+    .then((info) => {
       res.render("pages/home", {
         my_title: "Home Page",
         data: info[0],
         color: color_choice,
-        color_msg: info[1][0].color_msg
+        color_msg: info[1][0].color_msg,
       });
     })
-    .catch(err => {
+    .catch((err) => {
       // display error message in case an error
       console.log("error", err);
       response.render("pages/home", {
         my_title: "Home Page",
         data: "",
         color: "",
-        color_msg: ""
+        color_msg: "",
       });
     });
 });
@@ -186,40 +186,40 @@ app.get("/home/pick_color", function(req, res) {
 /*Add your other get/post request handlers below here: */
 
 // team stats page
-app.get("/team_stats", function(req, res) {
+app.get("/team_stats", function (req, res) {
   var all = "SELECT * FROM football_games;";
   var wins =
     "SELECT COUNT(*) FROM football_games WHERE home_score > visitor_score;";
   var losses =
     "SELECT COUNT(*) FROM football_games WHERE home_score < visitor_score;";
-  db.task("get-everything", task => {
+  db.task("get-everything", (task) => {
     return task.batch([task.any(all), task.any(wins), task.any(losses)]);
   })
-    .then(info => {
+    .then((info) => {
       res.render("pages/team_stats", {
         my_title: "Team Stats",
         data: info[0],
         win: info[1][0].count,
-        loss: info[2][0].count
+        loss: info[2][0].count,
       });
     })
-    .catch(err => {
+    .catch((err) => {
       // display error message in case an error
       console.log("error", err);
       res.render("pages/team_stats", {
         my_title: "Team Stats",
         data: "",
         win: "",
-        loss: ""
+        loss: "",
       });
     });
 });
 
 // player info page
-app.get("/player_info", function(req, res) {
+app.get("/player_info", function (req, res) {
   var query = "SELECT * FROM football_players;";
   db.any(query)
-    .then(function(rows) {
+    .then(function (rows) {
       res.render("pages/player_info", {
         my_title: "Player Info",
         option: rows,
@@ -230,10 +230,10 @@ app.get("/player_info", function(req, res) {
         p_yard: "",
         r_yard: "",
         re_yard: "",
-        img: "../resources/img/helmet.jpg"
+        img: "../resources/img/helmet.jpg",
       });
     })
-    .catch(err => {
+    .catch((err) => {
       //display error message in case an error
       console.log("error", err);
       res.render("pages/player_info", {
@@ -246,25 +246,25 @@ app.get("/player_info", function(req, res) {
         p_yard: "",
         r_yard: "",
         re_yard: "",
-        img: ""
+        img: "",
       });
     });
 });
 
-app.get("/player_info/post", function(req, res) {
+app.get("/player_info/post", function (req, res) {
   var choice = req.query.player_choice;
   var query = "SELECT * FROM football_players;";
   var player = "SELECT * FROM football_players WHERE id = " + choice + ";";
   var game_played =
     "SELECT COUNT(*) FROM football_games WHERE " + choice + "= ANY (players);";
-  db.task("get-everything", task => {
+  db.task("get-everything", (task) => {
     return task.batch([
       task.any(query),
       task.any(player),
-      task.any(game_played)
+      task.any(game_played),
     ]);
   })
-    .then(info => {
+    .then((info) => {
       res.render("pages/player_info", {
         my_title: "Player Info",
         option: info[0],
@@ -275,10 +275,10 @@ app.get("/player_info/post", function(req, res) {
         p_yard: info[1][0].passing_yards,
         r_yard: info[1][0].rushing_yards,
         re_yard: info[1][0].receiving_yards,
-        img: info[1][0].img_src
+        img: info[1][0].img_src,
       });
     })
-    .catch(err => {
+    .catch((err) => {
       //display error message in case an error
       console.log("error", err);
       res.render("pages/player_info", {
@@ -291,7 +291,7 @@ app.get("/player_info/post", function(req, res) {
         p_yard: "",
         r_yard: "",
         re_yard: "",
-        img: ""
+        img: "",
       });
     });
 });
